@@ -21,16 +21,23 @@ namespace SQLRest.Controllers
         {
             using (var connection = new SqlConnection(ConnectionString))
             {
-                var dbReader = new DatabaseReader(connection);
-
-                var resources = dbReader.AllTables().OrderBy(z => z.SchemaOwner).ThenBy(z => z.Name).Select(z => new Resource()
+                var metaData = connection.GetMetaData();
+                var resources = metaData.OrderBy(z => z.Schema).ThenBy(z => z.Name).Select(z => new Resource()
                 {
                     Name = z.Name,
-                    Domain = z.SchemaOwner,
-                    MetaDataUrl = Url.Action("GetMetaData", new { domain = z.SchemaOwner, resource = z.Name}),
-                    DataUrl = Url.Action("GetData", new { domain = z.SchemaOwner, resource = z.Name}),
+                    Domain = z.Schema,
+                    Links = new Link[]
+                    {
+                      new Link()
+                      {
+                          Rel = "data", Href =  Url.Action("GetData", new { domain = z.Schema, resource = z.Name})
+                      }  ,
+                      new Link()
+                      {
+                          Rel = "metadata", Href =  Url.Action("GetMetaData", new { domain = z.Schema, resource = z.Name})
+                      }  
+                    },
                 });
-                
                 return Ok(resources);
             }
         }
@@ -57,13 +64,12 @@ namespace SQLRest.Controllers
         
         [HttpGet]
         [Route("api/data/{domain}/{resource}")]
-        public async Task<ActionResult<IEnumerable<ExpandoObject>>> GetData([FromRouteAttribute] string domain, [FromRouteAttribute] string resource)
+        public async Task<ActionResult<IEnumerable<ExpandoObject>>> GetData([FromRouteAttribute] string domain, [FromRouteAttribute] string resource,[FromQuery] int count = 100)
         {
             using (var connection = new SqlConnection(ConnectionString))
             {
                 var metaData = connection.GetMetaData(domain, resource);
-                
-                var rows = await connection.QueryAsync($"SELECT *  FROM {domain}.{resource}");
+                var rows = await connection.QueryAsync($"SELECT TOP {count} *  FROM {metaData.Schema}.{metaData.Name}");
                 foreach (var row in rows)
                 {
                     row.links = new Link[]
@@ -101,8 +107,7 @@ namespace SQLRest.Controllers
         {
             public string Name { get; set; }
             public string Domain { get; set; }
-            public string MetaDataUrl { get; set; }
-            public string DataUrl { get; set; }
+            public Link[] Links { get; set; }
         }
 
         public class ResourceMetaData

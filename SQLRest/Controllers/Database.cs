@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 
@@ -17,6 +18,19 @@ namespace SQLRest.Controllers
                     Schema = domain,
                     PrimaryKeyName = t.PrimaryKeyColumn.Name
                 };
+            }
+        }
+        
+        public static IEnumerable<BasicTableMetaData> GetMetaData(this SqlConnection connection)
+        {
+            using (var reader = new DatabaseSchemaReader.DatabaseReader(connection))
+            {
+                return reader.AllTables().Select(z => new BasicTableMetaData()
+                {
+                    Name = z.Name,
+                    Schema = z.SchemaOwner,
+                    PrimaryKeyName = z.PrimaryKeyColumn.Name
+                });
             }
         }
 
