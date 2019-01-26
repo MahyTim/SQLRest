@@ -92,7 +92,7 @@ namespace SQLRest.Controllers
             using (var connection = new SqlConnection(ConnectionString))
             {
                 var metaData =  connection.GetMetaData(domain,resource);
-                var rows = await connection.QueryAsync($"SELECT *  FROM {domain}.{resource} WHERE {metaData.PrimaryKeyName} = @id", new {id});
+                var rows = await connection.QueryAsync($"SELECT *  FROM {metaData.Schema}.{metaData.Name} WHERE {metaData.PrimaryKeyName} = @id", new {id});
                 return Ok(rows.ToArray());
             }
         }
