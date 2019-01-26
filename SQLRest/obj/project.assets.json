@@ -25,6 +25,18 @@
           "lib/netstandard2.0/DatabaseSchemaReader.dll": {}
         }
       },
+      "FastMember.NetCore/1.1.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Reflection.Emit": "4.3.0"
+        },
+        "compile": {
+          "lib/netcoreapp2.0/FastMember.dll": {}
+        },
+        "runtime": {
+          "lib/netcoreapp2.0/FastMember.dll": {}
+        }
+      },
       "Microsoft.AspNet.WebApi.Client/5.2.6": {
         "type": "package",
         "dependencies": {
@@ -4497,6 +4509,18 @@
         "lib/netstandard1.5/DatabaseSchemaReader.xml",
         "lib/netstandard2.0/DatabaseSchemaReader.dll",
         "lib/netstandard2.0/DatabaseSchemaReader.xml"
+      ]
+    },
+    "FastMember.NetCore/1.1.0": {
+      "sha512": "gzmTauIq2Y1jEei3ozzSG6BqJuEMcjxHtfOWudCXCjUZqB1vj0p/biEYAGI2mcuxVqo8Z1o39EV+uhfDi169uA==",
+      "type": "package",
+      "path": "fastmember.netcore/1.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "fastmember.netcore.1.1.0.nupkg.sha512",
+        "fastmember.netcore.nuspec",
+        "lib/netcoreapp2.0/FastMember.dll"
       ]
     },
     "Microsoft.AspNet.WebApi.Client/5.2.6": {
@@ -12144,6 +12168,7 @@
     ".NETCoreApp,Version=v2.2": [
       "Dapper >= 1.50.5",
       "DatabaseSchemaReader >= 2.7.1",
+      "FastMember.NetCore >= 1.1.0",
       "Microsoft.AspNetCore.App >= 2.2.0",
       "Microsoft.AspNetCore.Razor.Design >= 2.2.0",
       "Microsoft.NETCore.App >= 2.2.0"
@@ -12197,6 +12222,10 @@
           "DatabaseSchemaReader": {
             "target": "Package",
             "version": "[2.7.1, )"
+          },
+          "FastMember.NetCore": {
+            "target": "Package",
+            "version": "[1.1.0, )"
           },
           "Microsoft.AspNetCore.App": {
             "suppressParent": "All",

@@ -8,6 +8,7 @@
     <ItemGroup>
         <PackageReference Include="Dapper" Version="1.50.5" />
         <PackageReference Include="DatabaseSchemaReader" Version="2.7.1" />
+        <PackageReference Include="FastMember.NetCore" Version="1.1.0" />
         <PackageReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     </ItemGroup>

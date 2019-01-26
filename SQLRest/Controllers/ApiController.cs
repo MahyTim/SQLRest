@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Dynamic;
 using System.Linq;
@@ -11,10 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace SQLRest.Controllers
 {
     [ApiController]
-    public class APIController : ControllerBase
+    public class ApiController : ControllerBase
     {
         private const string ConnectionString =
-            "Server=TIMMDEV\\SQLEXPRESS2016;Database=unipass;User Id=unipass;Password=uniPass1";
+            "Server=TIMMDEV\\SQLEXPRESS2016;Database=SQLRestDemo;User Id=unipass;Password=uniPass1";
         
         [HttpGet]
         [Route("api")]
@@ -62,9 +61,40 @@ namespace SQLRest.Controllers
         {
             using (var connection = new SqlConnection(ConnectionString))
             {
+                var metaData = connection.GetMetaData(domain, resource);
+                
                 var rows = await connection.QueryAsync($"SELECT *  FROM {domain}.{resource}");
+                foreach (var row in rows)
+                {
+                    row.links = new Link[]
+                    {
+                        new Link()
+                        {
+                            Rel = "self",
+                            Href = Url.Action("GetData", new {domain, resource, id = Reflection.GetPropertyValue(metaData.PrimaryKeyName,row) })
+                        }
+                    };
+                }
                 return Ok(rows.ToArray());
             }
+        }
+        
+        [HttpGet]
+        [Route("api/data/{domain}/{resource}/{id}")]
+        public async Task<ActionResult<IEnumerable<ExpandoObject>>> GetData([FromRouteAttribute] string domain, [FromRouteAttribute] string resource,[FromRouteAttribute] string id)
+        {
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                var metaData =  connection.GetMetaData(domain,resource);
+                var rows = await connection.QueryAsync($"SELECT *  FROM {domain}.{resource} WHERE {metaData.PrimaryKeyName} = @id", new {id});
+                return Ok(rows.ToArray());
+            }
+        }
+
+        public class Link
+        {
+            public string Rel { get; set; }
+            public string Href { get; set; }
         }
 
         public class Resource
