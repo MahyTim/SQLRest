@@ -1,0 +1,14 @@
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\bin\Debug\netcoreapp2.2\SQLRest.deps.json
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\bin\Debug\netcoreapp2.2\SQLRest.runtimeconfig.json
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\bin\Debug\netcoreapp2.2\SQLRest.runtimeconfig.dev.json
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\bin\Debug\netcoreapp2.2\SQLRest.dll
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\bin\Debug\netcoreapp2.2\SQLRest.pdb
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\obj\Debug\netcoreapp2.2\SQLRest.csprojAssemblyReference.cache
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\obj\Debug\netcoreapp2.2\SQLRest.csproj.CoreCompileInputs.cache
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\obj\Debug\netcoreapp2.2\SQLRest.RazorAssemblyInfo.cache
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\obj\Debug\netcoreapp2.2\SQLRest.RazorAssemblyInfo.cs
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\obj\Debug\netcoreapp2.2\SQLRest.AssemblyInfoInputs.cache
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\obj\Debug\netcoreapp2.2\SQLRest.AssemblyInfo.cs
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\obj\Debug\netcoreapp2.2\SQLRest.RazorTargetAssemblyInfo.cache
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\obj\Debug\netcoreapp2.2\SQLRest.dll
+C:\Users\timm\RiderProjects\SQLRest\SQLRest\obj\Debug\netcoreapp2.2\SQLRest.pdb
