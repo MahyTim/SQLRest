@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 
-namespace SQLRest.Controllers
+namespace SQLRest
 {
     public static class Database
     {
@@ -11,7 +11,9 @@ namespace SQLRest.Controllers
         {
             using (var reader = new DatabaseSchemaReader.DatabaseReader(connection))
             {
-                var t = reader.AllTables().First(z => string.Equals(z.SchemaOwner , domain,StringComparison.OrdinalIgnoreCase) && string.Equals(z.Name,resource,StringComparison.OrdinalIgnoreCase));
+                var t = reader.AllTables().First(z =>
+                    string.Equals(z.SchemaOwner, domain, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(z.Name, resource, StringComparison.OrdinalIgnoreCase));
                 return new BasicTableMetaData()
                 {
                     Name = resource,
@@ -20,7 +22,7 @@ namespace SQLRest.Controllers
                 };
             }
         }
-        
+
         public static IEnumerable<BasicTableMetaData> GetMetaData(this SqlConnection connection)
         {
             using (var reader = new DatabaseSchemaReader.DatabaseReader(connection))

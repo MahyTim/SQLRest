@@ -30,6 +30,10 @@
           "target": "Package",
           "version": "[1.50.5, )"
         },
+        "Dapper.Contrib": {
+          "target": "Package",
+          "version": "[1.50.5, )"
+        },
         "DatabaseSchemaReader": {
           "target": "Package",
           "version": "[2.7.1, )"
@@ -44,10 +48,18 @@
           "version": "[2.2.0, )",
           "autoReferenced": true
         },
+        "Microsoft.AspNetCore.OData": {
+          "target": "Package",
+          "version": "[7.1.0, )"
+        },
         "Microsoft.AspNetCore.Razor.Design": {
           "suppressParent": "All",
           "target": "Package",
           "version": "[2.2.0, )"
+        },
+        "Microsoft.EntityFrameworkCore.SqlServer": {
+          "target": "Package",
+          "version": "[2.2.1, )"
         },
         "Microsoft.NETCore.App": {
           "suppressParent": "All",

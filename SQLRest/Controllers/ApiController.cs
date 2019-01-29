@@ -1,25 +1,26 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Dynamic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using DatabaseSchemaReader;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace SQLRest.Controllers
 {
     [ApiController]
     public class ApiController : ControllerBase
     {
-        private const string ConnectionString =
-            "Server=TIMMDEV\\SQLEXPRESS2016;Database=SQLRestDemo;User Id=unipass;Password=uniPass1";
-        
+
         [HttpGet]
         [Route("api")]
         public async Task<ActionResult<IEnumerable<Resource>>> Get()
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            using (var connection = new SqlConnection(Settings.ConnectionString))
             {
                 var metaData = connection.GetMetaData();
                 var resources = metaData.OrderBy(z => z.Schema).ThenBy(z => z.Name).Select(z => new Resource()
@@ -28,45 +29,51 @@ namespace SQLRest.Controllers
                     Domain = z.Schema,
                     Links = new Link[]
                     {
-                      new Link()
-                      {
-                          Rel = "data", Href =  Url.Action("GetData", new { domain = z.Schema, resource = z.Name})
-                      }  ,
-                      new Link()
-                      {
-                          Rel = "metadata", Href =  Url.Action("GetMetaData", new { domain = z.Schema, resource = z.Name})
-                      }  
+                        new Link()
+                        {
+                            Rel = "data", Href = Url.Action("GetData", new {domain = z.Schema, resource = z.Name})
+                        },
+                        new Link()
+                        {
+                            Rel = "metadata",
+                            Href = Url.Action("GetMetaData", new {domain = z.Schema, resource = z.Name})
+                        }
                     },
                 });
                 return Ok(resources);
             }
         }
-        
+
         [HttpGet]
         [Route("api/metadata/{domain}/{resource}")]
-        public async Task<ActionResult<ResourceMetaData>> GetMetaData([FromRouteAttribute] string domain, [FromRouteAttribute] string resource)
+        public async Task<ActionResult<ResourceMetaData>> GetMetaData([FromRoute] string domain,
+            [FromRoute] string resource)
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            using (var connection = new SqlConnection(Settings.ConnectionString))
             {
                 var dbReader = new DatabaseReader(connection);
                 var metaData = new ResourceMetaData()
                 {
                     Name = resource,
-                    Fields =  dbReader.AllTables().First(z=> z.Name == resource && z.SchemaOwner == domain).Columns.Select(z=> new Field()
-                    {
-                        Name = z.Name,
-                        Type = z.IsForeignKey ? Url.Action("GetMetaData",new { domain = z.SchemaOwner, resource = z.Name}) : z.DataType.NetDataTypeCSharpName
-                    }).ToArray()
+                    Fields = dbReader.AllTables().First(z => z.Name == resource && z.SchemaOwner == domain).Columns
+                        .Select(z => new Field()
+                        {
+                            Name = z.Name,
+                            Type = z.IsForeignKey
+                                ? Url.Action("GetMetaData", new {domain = z.SchemaOwner, resource = z.Name})
+                                : z.DataType.NetDataTypeCSharpName
+                        }).ToArray()
                 };
                 return Ok(metaData);
             }
         }
-        
+
         [HttpGet]
         [Route("api/data/{domain}/{resource}")]
-        public async Task<ActionResult<IEnumerable<ExpandoObject>>> GetData([FromRouteAttribute] string domain, [FromRouteAttribute] string resource,[FromQuery] int count = 100)
+        public async Task<ActionResult<IEnumerable<ExpandoObject>>> GetData([FromRoute] string domain,
+            [FromRoute] string resource, [FromQuery] int count = 100)
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            using (var connection = new SqlConnection(Settings.ConnectionString))
             {
                 var metaData = connection.GetMetaData(domain, resource);
                 var rows = await connection.QueryAsync($"SELECT TOP {count} *  FROM {metaData.Schema}.{metaData.Name}");
@@ -77,23 +84,52 @@ namespace SQLRest.Controllers
                         new Link()
                         {
                             Rel = "self",
-                            Href = Url.Action("GetData", new {domain, resource, id = Reflection.GetPropertyValue(metaData.PrimaryKeyName,row) })
+                            Href = Url.Action("GetData",
+                                new {domain, resource, id = Reflection.GetPropertyValue(metaData.PrimaryKeyName, row)})
                         }
                     };
                 }
+
                 return Ok(rows.ToArray());
             }
         }
-        
+
         [HttpGet]
         [Route("api/data/{domain}/{resource}/{id}")]
-        public async Task<ActionResult<IEnumerable<ExpandoObject>>> GetData([FromRouteAttribute] string domain, [FromRouteAttribute] string resource,[FromRouteAttribute] string id)
+        public async Task<ActionResult<IEnumerable<ExpandoObject>>> GetData([FromRoute] string domain,
+            [FromRoute] string resource, [FromRoute] string id)
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            using (var connection = new SqlConnection(Settings.ConnectionString))
             {
-                var metaData =  connection.GetMetaData(domain,resource);
-                var rows = await connection.QueryAsync($"SELECT *  FROM {metaData.Schema}.{metaData.Name} WHERE {metaData.PrimaryKeyName} = @id", new {id});
-                return Ok(rows.ToArray());
+                var metaData = connection.GetMetaData(domain, resource);
+                var rows = await connection.QueryAsync(
+                    $"SELECT *  FROM {metaData.Schema}.{metaData.Name} WHERE {metaData.PrimaryKeyName} = @id",
+                    new {id});
+                return Ok(rows.FirstOrDefault());
+            }
+        }
+
+        [HttpPut]
+        [Route("api/data/{domain}/{resource}/{id}")]
+        public async Task<ActionResult<IEnumerable<ExpandoObject>>> GetData([FromRoute] string domain,
+            [FromRoute] string resource, [FromRoute] string id, [FromBody] JObject o)
+        {
+            using (var connection = new SqlConnection(Settings.ConnectionString))
+            {
+                var metaData = connection.GetMetaData(domain, resource);
+                var sqlBuilder = new StringBuilder($"UPDATE {metaData.Schema}.{metaData.Name} SET ");
+                foreach (var property in o.Properties())
+                {
+                    if (false == string.Equals(property.Name, metaData.PrimaryKeyName,
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        sqlBuilder.AppendLine($"{property.Name} = @{property.Name},");
+                    }
+                }
+
+                var sql = sqlBuilder.ToString().TrimEnd(',');
+                await SqlMapper.ExecuteAsync(connection, sql, (dynamic) o);
+                return Ok();
             }
         }
 

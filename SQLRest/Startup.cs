@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using SQLRest.Controllers;
 
 namespace SQLRest
 {
@@ -27,7 +28,8 @@ namespace SQLRest
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.ConfigureOData();
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.Configure<MvcJsonOptions>(options =>
             {
                 options.SerializerSettings.Formatting = Formatting.Indented;
@@ -50,7 +52,10 @@ namespace SQLRest
             }
 
             app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseMvc(b =>
+            {
+                ODataImplementation.ConfigureMvc(b);
+            });
         }
     }
 }
