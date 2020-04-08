@@ -13,7 +13,7 @@ namespace SQLRest.Controllers
     public class ApiController : ControllerBase
     {
         private const string ConnectionString =
-            "Server=TIMMDEV\\SQLEXPRESS2016;Database=SQLRestDemo;User Id=unipass;Password=uniPass1";
+            "Server=TIMMDEV\\SQLEXPRESS2016;Database=SQLRestDemo;User Id=xx;Password=xx";
         
         [HttpGet]
         [Route("api")]
